@@ -1,0 +1,74 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from prophet import Prophet
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+import numpy as np
+from prophet.diagnostics import cross_validation, performance_metrics
+
+# Load your dataset
+df = pd.read_csv('TSLA.csv')  # Replace with the path to your CSV file
+
+# Ensure the data is sorted by date if not already
+df['Date'] = pd.to_datetime(df['Date'])
+df = df.sort_values('Date')
+
+# Prepare the data for Prophet
+df_prophet = df[['Date', 'Close']].rename(columns={'Date': 'ds', 'Close': 'y'})
+
+# Initialize the Prophet model with additional seasonalities
+model = Prophet(
+    daily_seasonality=False,
+    yearly_seasonality=True,
+    weekly_seasonality=True,
+    changepoint_prior_scale=0.5
+)
+
+# Fit the model on the data
+model.fit(df_prophet)
+
+# Create a dataframe for future dates
+future = model.make_future_dataframe(periods=30, freq='B')  # Forecasting the next 30 business days
+
+# Forecast future stock prices
+forecast = model.predict(future)
+
+# Plot the original data and the forecast
+plt.figure(figsize=(12, 6))
+plt.plot(df_prophet['ds'], df_prophet['y'], label='Original')
+plt.plot(forecast['ds'], forecast['yhat'], label='Forecast', color='red')
+plt.fill_between(forecast['ds'], forecast['yhat_lower'], forecast['yhat_upper'], color='red', alpha=0.2)
+plt.title('Stock Price Forecast using Prophet')
+plt.xlabel('Date')
+plt.ylabel('Close Price')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Evaluate forecast accuracy using historical data if available
+train_size = int(len(df_prophet) * 0.8)  # Use 80% of data for training
+train, test = df_prophet[:train_size], df_prophet[train_size:]
+
+# Fit the Prophet model on the training set
+model = Prophet(daily_seasonality=False, yearly_seasonality=True, weekly_seasonality=True, changepoint_prior_scale=0.5)
+model.fit(train)
+
+# Create a dataframe for future dates that matches the length of the test set
+future_test = model.make_future_dataframe(periods=len(test), freq='B')
+
+# Make predictions on the test set
+forecast_test = model.predict(future_test)
+
+# Align the forecast with the actual test data
+test_forecast = forecast_test[['ds', 'yhat']].iloc[-len(test):]
+test_actual = test[['ds', 'y']].reset_index(drop=True)
+
+# Calculate RMSE and MAE
+rmse = np.sqrt(mean_squared_error(test_actual['y'], test_forecast['yhat']))
+mae = mean_absolute_error(test_actual['y'], test_forecast['yhat'])
+print(f'Root Mean Squared Error (RMSE): {rmse}')
+print(f'Mean Absolute Error (MAE): {mae}')
+
+# Cross-Validation for Prophet
+df_cv = cross_validation(model, initial='730 days', period='180 days', horizon='30 days')
+df_p = performance_metrics(df_cv)
+print(df_p.head())

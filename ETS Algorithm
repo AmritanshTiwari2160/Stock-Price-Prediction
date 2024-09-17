@@ -1,0 +1,64 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+
+# Load the dataset
+file_path = 'TSLA.csv'
+data = pd.read_csv(file_path)
+
+# Convert the 'Date' column to datetime format and set it as the index
+data['Date'] = pd.to_datetime(data['Date'], format='%Y-%m-%d')
+data.set_index('Date', inplace=True)
+
+# Select the 'Close' price for prediction
+data = data[['Close']]
+
+# Split data into training and testing datasets (80% training, 20% testing)
+train_size = int(len(data) * 0.8)
+train, test = data[:train_size], data[train_size:]
+
+# Fit the ETS model with seasonal component
+# Assuming daily data with yearly seasonality
+model = ExponentialSmoothing(train['Close'], trend='add', seasonal='add', seasonal_periods=252)
+model_fit = model.fit()
+
+# Print model parameters
+print("Model Parameters:")
+print(model_fit.params)
+
+# Make predictions
+train_pred = model_fit.fittedvalues
+test_pred = model_fit.forecast(steps=len(test))
+
+# Evaluate the model
+train_rmse = np.sqrt(mean_squared_error(train['Close'], train_pred))
+test_rmse = np.sqrt(mean_squared_error(test['Close'], test_pred))
+
+train_mae = mean_absolute_error(train['Close'], train_pred)
+test_mae = mean_absolute_error(test['Close'], test_pred)
+
+# Print the results
+print(f'Training RMSE: {train_rmse}')
+print(f'Test RMSE: {test_rmse}')
+print(f'Training MAE: {train_mae}')
+print(f'Test MAE: {test_mae}')
+
+# Plot the results
+plt.figure(figsize=(12, 6))
+
+# Plot the actual prices
+plt.plot(data.index, data['Close'], label='Actual Price', color='blue')
+
+# Plot the train predictions
+plt.plot(train.index, train_pred, label='Train Prediction', color='green')
+
+# Plot the test predictions
+plt.plot(test.index, test_pred, label='Test Prediction', color='red')
+
+plt.title('Tesla Stock Price Prediction with ETS')
+plt.xlabel('Date')
+plt.ylabel('Close Price')
+plt.legend()
+plt.show()
