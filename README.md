@@ -17,7 +17,7 @@ Stock price prediction remains one of the most challenging tasks in financial ma
 3. **ETS (Exponential Smoothing):**  
    A classical statistical approach, ETS uses weighted averages of past observations to forecast future values. By capturing the **level**, **trend**, and **seasonality**, it smooths out short-term fluctuations, offering reliable predictions.
 
-## 🧑‍💻 Data Preprocessing
+## 🔍 Data Preprocessing
 
 To ensure accurate model performance, the raw Tesla stock data is preprocessed with the following steps:
 
@@ -51,11 +51,3 @@ The comparative analysis of LSTM, Prophet, and ETS reveals each model’s streng
 ## 🔥 Key Takeaways
 
 This project offers a comprehensive exploration of stock price forecasting, comparing **deep learning**, **additive models**, and **statistical methods**. By evaluating each model's strengths and weaknesses, we gain insights into which method is best suited for financial time-series forecasting.
-
----
-
-### 🚀 How to Run the Project
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/stock-price-prediction.git
