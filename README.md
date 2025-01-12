@@ -2,9 +2,9 @@
 
 This project explores **stock price prediction** using three distinct time-series forecasting models: **Long Short-Term Memory (LSTM)**, **Prophet**, and **Exponential Smoothing (ETS)**. The dataset comprises **Tesla stock price data** (`TSLA.csv`), and the goal is to analyze and forecast future stock prices using cutting-edge techniques, ultimately evaluating model performance through key metrics like **RMSE** and **MAE**.
 
-## 🗂️ Project Overview
+## 🗂️ Key Insights
 
-Stock price prediction remains one of the most challenging tasks in financial markets. This project investigates the strengths and limitations of different forecasting models, blending **deep learning**, **additive models**, and **statistical methods** to generate accurate predictions. 
+This project investigates the strengths and limitations of different forecasting models, blending **deep learning**, **additive models**, and **statistical methods** to generate accurate predictions. 
 
 **Three Models Explored:**
 
